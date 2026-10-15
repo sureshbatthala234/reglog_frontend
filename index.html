@@ -38,7 +38,7 @@
 
       if (route === '/home') return <HomeScreen navigate={navigate} />;
       if (route === '/login') return <LoginScreen navigate={navigate} />;
-      if (route === '/forgot-password') return <ForgotScreen navigate={navigate} />;
+      if (route === '/forgot-password' || route === '/reset-password') return <ForgotScreen navigate={navigate} initialRoute={route} />;
       return <RegisterScreen navigate={navigate} />;
     }
 
@@ -377,8 +377,8 @@
     }
 
     // 4. FORGOT & RESET PASSWORD SCREEN
-    function ForgotScreen({ navigate }) {
-      const [step, setStep] = useState(1);
+    function ForgotScreen({ navigate, initialRoute }) {
+      const [step, setStep] = useState(initialRoute === '/reset-password' ? 3 : 1);
       const [identifier, setIdentifier] = useState('');
       const [otp, setOtp] = useState('');
       const [newPassword, setNewPassword] = useState('');
@@ -432,12 +432,31 @@
       const resetPassword = async (e) => {
         e.preventDefault();
         setError(''); setSuccess('');
+        if (!identifier.trim() || !otp.trim() || !newPassword || !confirmPassword) {
+          setError('All fields are required.');
+          return;
+        }
         if (newPassword !== confirmPassword) {
           setError('Passwords do not match.');
           return;
         }
+        const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-=\[\]{};':"\\|,.<>\/]).{8,}$/;
+        if (!pwdRegex.test(newPassword)) {
+          setError('Password must be at least 8 characters and include uppercase, lowercase, numeric and special characters.');
+          return;
+        }
         setLoading(true);
         try {
+          // Verify OTP
+          const vRes = await fetch(`${API_BASE}/verify-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: identifier.trim(), otp: otp.trim() })
+          });
+          const vData = await vRes.json();
+          if (!vRes.ok) throw new Error(vData.error || 'Invalid OTP');
+
+          // Reset password
           const res = await fetch(`${API_BASE}/reset-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -512,6 +531,29 @@
             {step === 3 && (
               <form onSubmit={resetPassword}>
                 <div className="form-group">
+                  <label className="form-label">Email or Mobile Number</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter registered email or mobile"
+                    className="classmorphic-input"
+                    value={identifier}
+                    onChange={e => setIdentifier(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">6-Digit OTP</label>
+                  <input
+                    type="text"
+                    maxLength="6"
+                    required
+                    placeholder="Enter 6-digit OTP"
+                    className="classmorphic-input"
+                    value={otp}
+                    onChange={e => setOtp(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
                   <label className="form-label">New Password</label>
                   <input
                     type="password"
@@ -534,8 +576,17 @@
                   />
                 </div>
                 <button type="submit" className="sunshine-btn" disabled={loading}>
-                  {loading ? 'Updating...' : 'Set New Password'}
+                  {loading ? 'Updating Password...' : 'Reset Password'}
                 </button>
+                <div className="card-footer-links" style={{ marginTop: '12px' }}>
+                  <button
+                    type="button"
+                    style={{ background: 'none', border: 'none', color: '#fbbf24', cursor: 'pointer', fontSize: '12px' }}
+                    onClick={() => setStep(1)}
+                  >
+                    Need an OTP? Click here to request
+                  </button>
+                </div>
               </form>
             )}
 
