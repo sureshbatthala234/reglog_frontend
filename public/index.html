@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f59e0b" />
+  <title>RegLog Service — Sunshine Classmorphism</title>
+  <link rel="stylesheet" href="../src/styles/sunshine-classmorphism.css">
+  <!-- React 18, ReactDOM & Babel for zero-install instant browser runtime -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="sunshine-body" id="app-body">
+  <div id="root"></div>
+
+  <!-- Standalone Interactive React Application (Runs standalone or with React dev server) -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const API_BASE = 'http://localhost:8080/api/auth';
+
+    function App() {
+      // Simple client-side router matching specifications
+      const [route, setRoute] = useState(window.location.hash.replace('#', '') || '/register');
+
+      useEffect(() => {
+        const handleHash = () => {
+          setRoute(window.location.hash.replace('#', '') || '/register');
+        };
+        window.addEventListener('hashchange', handleHash);
+        return () => window.removeEventListener('hashchange', handleHash);
+      }, []);
+
+      const navigate = (newRoute) => {
+        window.location.hash = newRoute;
+        setRoute(newRoute);
+      };
+
+      if (route === '/home') return <HomeScreen navigate={navigate} />;
+      if (route === '/login') return <LoginScreen navigate={navigate} />;
+      if (route === '/forgot-password') return <ForgotScreen navigate={navigate} />;
+      return <RegisterScreen navigate={navigate} />;
+    }
+
+    // 1. REGISTER SCREEN (Sunshine Classmorphism)
+    function RegisterScreen({ navigate }) {
+      const [form, setForm] = useState({ fullName: '', email: '', mobileNumber: '', password: '', confirmPassword: '' });
+      const [error, setError] = useState('');
+      const [success, setSuccess] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [showP, setShowP] = useState(false);
+      const [showCP, setShowCP] = useState(false);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+
+        // Required fields
+        if (!form.fullName.trim() || !form.email.trim() || !form.mobileNumber.trim() || !form.password || !form.confirmPassword) {
+          setError('All fields are required.');
+          return;
+        }
+
+        // Email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(form.email.trim())) {
+          setError('Please provide a valid email address.');
+          return;
+        }
+
+        // 10 mobile digits
+        if (!/^\d{10}$/.test(form.mobileNumber.trim())) {
+          setError('Mobile number must be exactly 10 digits.');
+          return;
+        }
+
+        // Matching passwords
+        if (form.password !== form.confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+        }
+
+        // Password complexity (8+ chars, upper, lower, digit, special)
+        const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-=\[\]{};':"\\|,.<>\/]).{8,}$/;
+        if (!pwdRegex.test(form.password)) {
+          setError('Password must be at least 8 characters and include uppercase, lowercase, numeric and special characters.');
+          return;
+        }
+
+        setLoading(true);
+        try {
+          const res = await fetch(`${API_BASE}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(form)
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Registration failed');
+
+          setSuccess('Registration successful! Redirecting to login...');
+          setTimeout(() => navigate('/login'), 1500);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <div className="sun-orb sun-orb-1"></div>
+          <div className="sun-orb sun-orb-2"></div>
+          <div className="sun-orb sun-orb-3"></div>
+
+          <div className="classmorphism-card">
+            <div className="card-header">
+              <div className="sun-icon-badge">☀️</div>
+              <h2 className="card-title">Registration</h2>
+              <p className="card-subtitle">Sunshine Classmorphism Experience</p>
+            </div>
+
+            {error && <div className="alert-box alert-error">⚠️ {error}</div>}
+            {success && <div className="alert-box alert-success">✓ {success}</div>}
+
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label className="form-label">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="John Doe"
+                  className="classmorphic-input"
+                  value={form.fullName}
+                  onChange={e => setForm({...form, fullName: e.target.value})}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="john@example.com"
+                  className="classmorphic-input"
+                  value={form.email}
+                  onChange={e => setForm({...form, email: e.target.value})}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Mobile Number (10 Digits)</label>
+                <input
+                  type="tel"
+                  maxLength="10"
+                  required
+                  placeholder="9876543210"
+                  className="classmorphic-input"
+                  value={form.mobileNumber}
+                  onChange={e => setForm({...form, mobileNumber: e.target.value})}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Password</label>
+                <div className="input-wrapper">
+                  <input
+                    type={showP ? 'text' : 'password'}
+                    required
+                    placeholder="Min 8 chars, A-Z, a-z, 0-9, symbol"
+                    className="classmorphic-input"
+                    value={form.password}
+                    onChange={e => setForm({...form, password: e.target.value})}
+                  />
+                  <button type="button" className="toggle-btn" onClick={() => setShowP(!showP)}>
+                    {showP ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Confirm Password</label>
+                <div className="input-wrapper">
+                  <input
+                    type={showCP ? 'text' : 'password'}
+                    required
+                    placeholder="Confirm password"
+                    className="classmorphic-input"
+                    value={form.confirmPassword}
+                    onChange={e => setForm({...form, confirmPassword: e.target.value})}
+                  />
+                  <button type="button" className="toggle-btn" onClick={() => setShowCP(!showCP)}>
+                    {showCP ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" className="sunshine-btn" disabled={loading}>
+                {loading ? 'Creating Account...' : 'Register'}
+              </button>
+            </form>
+
+            <p className="footer-text">
+              Already have an account? <a href="#/login" onClick={() => navigate('/login')}>Login</a>
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // 2. LOGIN SCREEN (Sunshine Classmorphism)
+    function LoginScreen({ navigate }) {
+      const [identifier, setIdentifier] = useState('');
+      const [password, setPassword] = useState('');
+      const [showP, setShowP] = useState(false);
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const handleLogin = async (e) => {
+        e.preventDefault();
+        setError('');
+        if (!identifier.trim() || !password) {
+          setError('Invalid credentials.');
+          return;
+        }
+
+        setLoading(true);
+        try {
+          const res = await fetch(`${API_BASE}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: identifier.trim(), password })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.token) {
+            // Generic error message as required
+            throw new Error('Invalid credentials.');
+          }
+
+          localStorage.setItem('reglog_token', data.token);
+          navigate('/home');
+        } catch (err) {
+          setError('Invalid credentials.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <div className="sun-orb sun-orb-1"></div>
+          <div className="sun-orb sun-orb-2"></div>
+          <div className="sun-orb sun-orb-3"></div>
+
+          <div className="classmorphism-card">
+            <div className="card-header">
+              <div className="sun-icon-badge">☀️</div>
+              <h2 className="card-title">Welcome Back</h2>
+              <p className="card-subtitle">Sunshine Classmorphism Login</p>
+            </div>
+
+            {error && <div className="alert-box alert-error">⚠️ {error}</div>}
+
+            <form onSubmit={handleLogin}>
+              <div className="form-group">
+                <label className="form-label">Email Address or Mobile Number</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Email or 10-digit mobile"
+                  className="classmorphic-input"
+                  value={identifier}
+                  onChange={e => setIdentifier(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Password</label>
+                <div className="input-wrapper">
+                  <input
+                    type={showP ? 'text' : 'password'}
+                    required
+                    placeholder="Enter password"
+                    className="classmorphic-input"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                  />
+                  <button type="button" className="toggle-btn" onClick={() => setShowP(!showP)}>
+                    {showP ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="card-footer-links">
+                <div></div>
+                <a href="#/forgot-password" onClick={() => navigate('/forgot-password')}>Forgot Password?</a>
+              </div>
+
+              <button type="submit" className="sunshine-btn" disabled={loading}>
+                {loading ? 'Authenticating...' : 'Login'}
+              </button>
+            </form>
+
+            <p className="footer-text">
+              Don't have an account? <a href="#/register" onClick={() => navigate('/register')}>Register</a>
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // 3. HOME SCREEN (Completely Blank White #FFFFFF, Protected Route)
+    function HomeScreen({ navigate }) {
+      useEffect(() => {
+        const token = localStorage.getItem('reglog_token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
+
+        // Validate token with backend
+        fetch(`${API_BASE}/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(res => {
+          if (!res.ok) {
+            localStorage.removeItem('reglog_token');
+            navigate('/login');
+          }
+        }).catch(() => {
+          localStorage.removeItem('reglog_token');
+          navigate('/login');
+        });
+
+        // Invisible Logout Listener (Prompt: without adding a visible logout button to the blank Home page)
+        const triggerLogout = async () => {
+          try {
+            await fetch(`${API_BASE}/logout`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+          } finally {
+            localStorage.removeItem('reglog_token');
+            navigate('/login');
+          }
+        };
+
+        const handleKey = (e) => {
+          if (e.key === 'Escape' || (e.altKey && e.key.toLowerCase() === 'l') || e.key.toLowerCase() === 'q') {
+            triggerLogout();
+          }
+        };
+        const handleDblClick = () => triggerLogout();
+
+        window.addEventListener('keydown', handleKey);
+        window.addEventListener('dblclick', handleDblClick);
+
+        return () => {
+          window.removeEventListener('keydown', handleKey);
+          window.removeEventListener('dblclick', handleDblClick);
+        };
+      }, [navigate]);
+
+      // Render NO visible content, pure white background #FFFFFF
+      return (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: '#FFFFFF',
+          margin: 0,
+          padding: 0,
+          zIndex: 9999
+        }} />
+      );
+    }
+
+    // 4. FORGOT & RESET PASSWORD SCREEN
+    function ForgotScreen({ navigate }) {
+      const [step, setStep] = useState(1);
+      const [identifier, setIdentifier] = useState('');
+      const [otp, setOtp] = useState('');
+      const [newPassword, setNewPassword] = useState('');
+      const [confirmPassword, setConfirmPassword] = useState('');
+      const [error, setError] = useState('');
+      const [success, setSuccess] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const requestOtp = async (e) => {
+        e.preventDefault();
+        setError(''); setSuccess('');
+        setLoading(true);
+        try {
+          const res = await fetch(`${API_BASE}/forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: identifier.trim() })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'User not found');
+          setSuccess(`OTP Generated: ${data.otp || '(Check console)'}`);
+          setStep(2);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const verifyOtp = async (e) => {
+        e.preventDefault();
+        setError(''); setSuccess('');
+        setLoading(true);
+        try {
+          const res = await fetch(`${API_BASE}/verify-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: identifier.trim(), otp: otp.trim() })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Invalid OTP');
+          setSuccess('OTP verified! Enter new password.');
+          setStep(3);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const resetPassword = async (e) => {
+        e.preventDefault();
+        setError(''); setSuccess('');
+        if (newPassword !== confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+        }
+        setLoading(true);
+        try {
+          const res = await fetch(`${API_BASE}/reset-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: identifier.trim(), otp: otp.trim(), newPassword, confirmPassword })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Reset failed');
+          setSuccess('Password reset successfully! Redirecting to login...');
+          setTimeout(() => navigate('/login'), 1500);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <div className="sun-orb sun-orb-1"></div>
+          <div className="sun-orb sun-orb-2"></div>
+          <div className="sun-orb sun-orb-3"></div>
+
+          <div className="classmorphism-card">
+            <div className="card-header">
+              <div className="sun-icon-badge">☀️</div>
+              <h2 className="card-title">Reset Password</h2>
+              <p className="card-subtitle">Sunshine OTP Recovery</p>
+            </div>
+
+            {error && <div className="alert-box alert-error">⚠️ {error}</div>}
+            {success && <div className="alert-box alert-success">✓ {success}</div>}
+
+            {step === 1 && (
+              <form onSubmit={requestOtp}>
+                <div className="form-group">
+                  <label className="form-label">Email or Mobile Number</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter registered email or mobile"
+                    className="classmorphic-input"
+                    value={identifier}
+                    onChange={e => setIdentifier(e.target.value)}
+                  />
+                </div>
+                <button type="submit" className="sunshine-btn" disabled={loading}>
+                  {loading ? 'Sending...' : 'Send OTP'}
+                </button>
+              </form>
+            )}
+
+            {step === 2 && (
+              <form onSubmit={verifyOtp}>
+                <div className="form-group">
+                  <label className="form-label">6-Digit OTP</label>
+                  <input
+                    type="text"
+                    maxLength="6"
+                    required
+                    placeholder="e.g. 123456"
+                    className="classmorphic-input"
+                    value={otp}
+                    onChange={e => setOtp(e.target.value)}
+                  />
+                </div>
+                <button type="submit" className="sunshine-btn" disabled={loading}>
+                  {loading ? 'Verifying...' : 'Verify OTP'}
+                </button>
+              </form>
+            )}
+
+            {step === 3 && (
+              <form onSubmit={resetPassword}>
+                <div className="form-group">
+                  <label className="form-label">New Password</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Min 8 chars with uppercase, digit, symbol"
+                    className="classmorphic-input"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Confirm New Password</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Re-enter new password"
+                    className="classmorphic-input"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+                <button type="submit" className="sunshine-btn" disabled={loading}>
+                  {loading ? 'Updating...' : 'Set New Password'}
+                </button>
+              </form>
+            )}
+
+            <p className="footer-text">
+              <a href="#/login" onClick={() => navigate('/login')}>Back to Login</a>
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

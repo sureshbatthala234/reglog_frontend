@@ -1,0 +1,301 @@
+/* ==========================================================================
+   Sunshine Classmorphism Design System
+   Warm yellow accents, soft shadows, frosted glass blur, rounded components
+   ========================================================================== */
+
+:root {
+  --sunshine-primary: #f59e0b;
+  --sunshine-primary-hover: #d97706;
+  --sunshine-light: #fef3c7;
+  --sunshine-accent: #fbbf24;
+  --sunshine-gold: #fde68a;
+  --sunshine-dark: #1e1b18;
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(251, 191, 36, 0.35);
+  --glass-shadow: 0 20px 50px rgba(217, 119, 6, 0.15), 0 10px 25px rgba(0, 0, 0, 0.35);
+  --input-bg: rgba(255, 255, 255, 0.08);
+  --input-border: rgba(251, 191, 36, 0.25);
+  --text-primary: #ffffff;
+  --text-secondary: #fef3c7;
+  --text-muted: #d1d5db;
+  --radius-lg: 24px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Sunshine Background with Ambient Sun Orbs */
+body.sunshine-body {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 15%, #451a03 0%, #1c1917 50%, #0c0a09 100%);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
+  padding: 20px;
+}
+
+.sun-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sun-orb-1 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(217, 119, 6, 0.2) 70%);
+  top: 5%;
+  left: 20%;
+  animation: sunPulse 10s ease-in-out infinite alternate;
+}
+
+.sun-orb-2 {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.35) 0%, rgba(180, 83, 9, 0.15) 70%);
+  bottom: 10%;
+  right: 20%;
+  animation: sunPulse 12s ease-in-out infinite alternate-reverse;
+}
+
+.sun-orb-3 {
+  width: 250px;
+  height: 250px;
+  background: rgba(253, 230, 138, 0.25);
+  top: 40%;
+  right: 15%;
+}
+
+@keyframes sunPulse {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.08) translate(20px, 25px); }
+  100% { transform: scale(0.95) translate(-15px, 15px); }
+}
+
+/* Classmorphism Card */
+.classmorphism-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  padding: 38px 32px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.sun-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(245, 158, 11, 0.15));
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: #fbbf24;
+  font-size: 24px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+}
+
+.card-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.card-subtitle {
+  font-size: 13px;
+  color: var(--sunshine-light);
+  opacity: 0.85;
+  margin-top: 5px;
+}
+
+/* Form Groups & Inputs */
+.form-group {
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sunshine-light);
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.classmorphic-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: #ffffff;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.classmorphic-input::placeholder {
+  color: rgba(254, 243, 199, 0.45);
+}
+
+.classmorphic-input:focus {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--sunshine-accent);
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.45);
+}
+
+/* Buttons */
+.sunshine-btn {
+  width: 100%;
+  padding: 13px 18px;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #1e1b18;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: 0 8px 20px -3px rgba(245, 158, 11, 0.5);
+  transition: all 0.25s ease;
+}
+
+.sunshine-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px -3px rgba(245, 158, 11, 0.7);
+  background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 50%, #f59e0b 100%);
+}
+
+.sunshine-btn:active {
+  transform: translateY(0);
+}
+
+.sunshine-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Alert Messages */
+.alert-box {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+  backdrop-filter: blur(10px);
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #6ee7b7;
+  backdrop-filter: blur(10px);
+}
+
+/* Card Links & Footer */
+.card-footer-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 12px;
+}
+
+.card-footer-links a,
+.footer-text a {
+  color: var(--sunshine-accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.card-footer-links a:hover,
+.footer-text a:hover {
+  color: #fde68a;
+  text-decoration: underline;
+}
+
+.footer-text {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--sunshine-light);
+  opacity: 0.9;
+  margin-top: 20px;
+}
+
+/* Password Visibility Toggle */
+.toggle-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--sunshine-light);
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 4px;
+}
+.toggle-btn:hover {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Home Page — Completely Blank White
+   Pure white background #FFFFFF, no visible UI content
+   ========================================================================== */
+.home-blank-white {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  cursor: default;
+}
