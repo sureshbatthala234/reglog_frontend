@@ -17,7 +17,7 @@
   <!-- Standalone Interactive React Application (Runs standalone or with React dev server) -->
   <script type="text/babel">
     const { useState, useEffect } = React;
-    const API_BASE = 'http://localhost:8080/api/auth';
+    const API_BASE = window.location.origin.startsWith('http') ? (window.location.origin.includes('3000') ? 'http://localhost:8080/api/auth' : window.location.origin + '/api/auth') : 'http://localhost:8080/api/auth';
 
     function App() {
       // Simple client-side router matching specifications
