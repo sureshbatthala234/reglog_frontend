@@ -19,20 +19,40 @@
     const { useState, useEffect } = React;
     const API_BASE = window.location.origin.startsWith('http') ? (window.location.origin.includes('3000') ? 'http://localhost:8080/api/auth' : window.location.origin + '/api/auth') : 'http://localhost:8080/api/auth';
 
+    function getActiveRoute() {
+      const pathname = window.location.pathname;
+      if (pathname.startsWith('/auth/')) {
+        return pathname.replace('/auth', '');
+      } else if (pathname === '/auth') {
+        return '/login';
+      } else if (pathname === '/home') {
+        return '/home';
+      }
+      const hash = window.location.hash.replace('#', '');
+      if (hash) {
+        return hash.startsWith('/auth/') ? hash.replace('/auth', '') : hash;
+      }
+      return '/register';
+    }
+
     function App() {
-      // Simple client-side router matching specifications
-      const [route, setRoute] = useState(window.location.hash.replace('#', '') || '/register');
+      const [route, setRoute] = useState(getActiveRoute());
 
       useEffect(() => {
-        const handleHash = () => {
-          setRoute(window.location.hash.replace('#', '') || '/register');
+        const handleLocationChange = () => {
+          setRoute(getActiveRoute());
         };
-        window.addEventListener('hashchange', handleHash);
-        return () => window.removeEventListener('hashchange', handleHash);
+        window.addEventListener('popstate', handleLocationChange);
+        window.addEventListener('hashchange', handleLocationChange);
+        return () => {
+          window.removeEventListener('popstate', handleLocationChange);
+          window.removeEventListener('hashchange', handleLocationChange);
+        };
       }, []);
 
       const navigate = (newRoute) => {
-        window.location.hash = newRoute;
+        const targetPath = (newRoute === '/home') ? '/home' : ('/auth' + newRoute);
+        window.history.pushState({}, '', targetPath);
         setRoute(newRoute);
       };
 
@@ -201,7 +221,7 @@
             </form>
 
             <p className="footer-text">
-              Already have an account? <a href="#/login" onClick={() => navigate('/login')}>Login</a>
+              Already have an account? <a href="/auth/login" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>Login</a>
             </p>
           </div>
         </div>
@@ -293,7 +313,7 @@
 
               <div className="card-footer-links">
                 <div></div>
-                <a href="#/forgot-password" onClick={() => navigate('/forgot-password')}>Forgot Password?</a>
+                <a href="/auth/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }}>Forgot Password?</a>
               </div>
 
               <button type="submit" className="sunshine-btn" disabled={loading}>
@@ -302,7 +322,7 @@
             </form>
 
             <p className="footer-text">
-              Don't have an account? <a href="#/register" onClick={() => navigate('/register')}>Register</a>
+              Don't have an account? <a href="/auth/register" onClick={(e) => { e.preventDefault(); navigate('/register'); }}>Register</a>
             </p>
           </div>
         </div>
@@ -591,7 +611,7 @@
             )}
 
             <p className="footer-text">
-              <a href="#/login" onClick={() => navigate('/login')}>Back to Login</a>
+              <a href="/auth/login" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>Back to Login</a>
             </p>
           </div>
         </div>
