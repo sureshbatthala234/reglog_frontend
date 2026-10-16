@@ -1,82 +1,175 @@
 # RegLog Frontend — Sunshine Classmorphism React Interface
 
-A modern, responsive, sunshine-themed classmorphism user interface for user registration, authentication, OTP password recovery, and secure sessions. Built with React.js, React Router, and standard modern CSS.
+A modern, responsive React.js frontend for user registration, login, OTP-based password recovery, and secure JWT session management. Features a warm "Sunshine Classmorphism" design with glowing sun orbs, frosted glass cards, and golden accents.
 
 ---
 
-## 1. Features & Design Highlights
+## Tech Stack
 
-- **Sunshine Classmorphism Theme**: Warm golden accents (`#f59e0b`, `#fbbf24`), glowing ambient sun orbs, frosted glass blur (`backdrop-filter: blur(24px)`), smooth rounded components, and elegant typography.
-- **Registration Page (`/register`)**:
-  - Full Name, Email Address, Mobile Number (10 digits), Password, and Confirm Password.
-  - Client-side and server-side validation (email format, 10 mobile digits, password complexity: 8+ characters, upper, lower, digit, special character).
-  - Automatically navigates to `/login` upon successful registration.
-- **Login Page (`/login`)**:
-  - Accepts either Email Address or 10-digit Mobile Number + Password.
-  - Generic invalid-credentials feedback preventing user enumeration.
-  - Navigates to `/home` upon successful authentication with JWT token storage.
-- **Home Page (`/home`) — Pure Blank White**:
-  - Route: `/home`.
-  - Color: `#FFFFFF`.
-  - Intentionally renders zero visible elements (no navbar, buttons, headings, or cards) as per specification.
-  - Protected: Unauthenticated or expired sessions automatically redirect to `/login`.
-  - Invisible Logout Handler: Double-click anywhere on the screen or press `Escape` / `Alt+L` to securely log out and revoke the session on the backend.
-- **Forgot & Reset Password (`/forgot-password`)**:
-  - 3-step recovery: Request OTP → Verify OTP → Reset Password.
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 18 |
+| Routing | React Router DOM v6 |
+| HTTP Client | Native `fetch` API |
+| Styling | Custom CSS (Sunshine Classmorphism) |
+| Auth Storage | `localStorage` (JWT token) |
+| Build Tool | Create React App (`react-scripts` 5.0.1) |
 
 ---
 
-## 2. Prerequisites
+## Project Structure
 
-- Any modern web browser (Google Chrome, Microsoft Edge, Mozilla Firefox, Safari).
-- Node.js & npm (optional, if running via `npm start`).
+```
+reglog_frontend/
+├── public/
+│   └── index.html                        # CRA public HTML template
+├── src/
+│   ├── App.js                            # Root component — React Router setup
+│   ├── index.js                          # React DOM entry point
+│   ├── components/
+│   │   ├── Login.js                      # Login page (email or mobile + password)
+│   │   ├── Register.js                   # Registration page (full form + validation)
+│   │   ├── Home.js                       # Protected blank white home page
+│   │   └── ForgotPassword.js             # 3-step OTP password recovery
+│   ├── services/
+│   │   └── api.js                        # Centralized API service (fetch wrapper + token management)
+│   └── styles/
+│       └── sunshine-classmorphism.css    # Custom Sunshine Classmorphism theme
+├── index.html                            # Standalone single-file version (no build needed)
+├── package.json
+└── .gitignore
+```
 
 ---
 
-## 3. How to Run the Frontend
+## Application Routes
 
-### Method 1: Instant Browser Preview (Zero Installation)
-Simply double-click [`index.html`](index.html) or open it in your browser:
-- Path: `reglog_frontend/index.html`
-- Uses standalone React 18 & Babel embedded runtime that connects directly to the Java backend at `http://localhost:8080/api/auth`.
+| Route | Component | Description |
+|-------|-----------|-------------|
+| `/` | Redirect | Auto-redirects to `/login` |
+| `/login` | `<Login />` | Login with email or 10-digit mobile + password |
+| `/register` | `<Register />` | New user registration |
+| `/home` | `<Home />` | Protected blank white page — shown after login |
+| `/forgot-password` | `<ForgotPassword />` | 3-step OTP password recovery |
+| `/reset-password` | `<ForgotPassword />` | Same component as forgot-password |
+| `*` | Redirect | Any unknown route redirects to `/login` |
 
-### Method 2: Standard React Development Server
-If Node.js and npm are installed:
+---
+
+## Features
+
+### Login (`/login`)
+- Accepts **Email Address** or **10-digit Mobile Number** as identifier
+- Secure JWT token stored in `localStorage` on success
+- Navigates to `/home` after successful login
+- Generic `"Invalid credentials."` error prevents user enumeration
+
+### Register (`/register`)
+- Fields: Full Name, Email, Mobile Number, Password, Confirm Password
+- Client-side validation:
+  - Valid email format
+  - Mobile: exactly 10 digits
+  - Password: min 8 chars, uppercase, lowercase, digit, and special character
+  - Passwords must match
+- Auto-navigates to `/login` after 1.5 seconds on success
+
+### Home (`/home`) — Protected
+- Pure white screen (`#FFFFFF`) — intentionally blank
+- **Authentication guard**: checks JWT token and verifies with backend `/api/auth/me` on load
+- Expired/revoked tokens auto-redirect to `/login`
+- **Invisible logout** (no visible button):
+  - Press `Escape` key
+  - Press `Alt + L`
+  - Press `Q` key
+  - Double-click anywhere on the screen
+
+### Forgot Password (`/forgot-password`) — 3-Step Flow
+1. **Step 1 — Request OTP**: Enter registered email or mobile → receive 6-digit OTP
+2. **Step 2 — Verify OTP**: Enter the OTP code from server console (dev mode)
+3. **Step 3 — Reset Password**: Set and confirm a new password (same complexity rules as registration)
+
+---
+
+## Prerequisites
+
+- **Node.js** (v16+) and **npm** (for React development server)
+- **reglog_backend** running on `http://localhost:8080`
+
+---
+
+## How to Run
+
+### Method 1 — React Development Server
+
 ```bash
 # 1. Install dependencies
 npm install
 
-# 2. Start development server
+# 2. Start the dev server
 npm start
 ```
-The application will launch at `http://localhost:3000`.
+
+Opens at **`http://localhost:3000`**
+
+### Method 2 — Instant Preview (No Build Required)
+
+Open the standalone [`index.html`](index.html) directly in any browser. It uses embedded React + Babel CDN and connects directly to `http://localhost:8080/api/auth`.
 
 ---
 
-## 4. Environment Variables
+## Environment Variables
 
-You can configure the backend API endpoint by creating a `.env` file in the root of `reglog_frontend`:
+Create a `.env` file in the `reglog_frontend/` root to override the API base URL:
 
 ```env
 REACT_APP_API_BASE_URL=http://localhost:8080/api/auth
 ```
 
----
-
-## 5. Application Routes
-
-| Route | Component | Description |
-| :--- | :--- | :--- |
-| `/register` | `<Register />` | User registration with Sunshine classmorphism styling |
-| `/login` | `<Login />` | Login with email or 10-digit mobile number |
-| `/home` | `<Home />` | Protected pure blank white canvas (`#FFFFFF`) with invisible logout |
-| `/forgot-password` | `<ForgotPassword />` | OTP generation, verification, and password reset |
-| `/` | Redirect | Automatically redirects to `/login` |
+Default (if `.env` is absent): `http://localhost:8080/api/auth`
 
 ---
 
-## 6. Troubleshooting
+## API Integration
 
-- **CORS Error**: Ensure the backend server (`reglog_backend`) is running on port 8080.
-- **Cannot connect to backend**: Verify `application.properties` in `reglog_backend` has database credentials and server port 8080 active.
-- **Blank white screen on Home**: This is intentional! The Home page is designed to be completely blank white (`#FFFFFF`) with invisible logout (`Escape` key or double-click).
+All API calls are centralized in [`src/services/api.js`](src/services/api.js):
+
+| Function | Method | Endpoint |
+|----------|--------|----------|
+| `authApi.register(payload)` | POST | `/api/auth/register` |
+| `authApi.login(payload)` | POST | `/api/auth/login` |
+| `authApi.logout()` | POST | `/api/auth/logout` |
+| `authApi.getMe()` | GET | `/api/auth/me` |
+| `authApi.forgotPassword(identifier)` | POST | `/api/auth/forgot-password` |
+| `authApi.verifyOtp(identifier, otp)` | POST | `/api/auth/verify-otp` |
+| `authApi.resetPassword(payload)` | POST | `/api/auth/reset-password` |
+| `authApi.changePassword(payload)` | PUT | `/api/auth/change-password` |
+
+JWT token helpers:
+- `setAuthToken(token)` — saves token to `localStorage`
+- `getAuthToken()` — retrieves token from `localStorage`
+- `removeAuthToken()` — deletes token from `localStorage`
+- `isAuthenticated()` — returns `true` if token exists
+
+---
+
+## Design — Sunshine Classmorphism
+
+The theme uses warm golden tones with glassmorphism-style cards:
+
+- **Colors**: `#f59e0b` (amber), `#fbbf24` (yellow), warm gradient backgrounds
+- **Cards**: `backdrop-filter: blur(24px)` frosted glass effect
+- **Orbs**: Three animated glowing sun orbs as ambient background elements
+- **Typography**: Rounded, clean, modern sans-serif
+- **Buttons**: Gradient golden with hover glow effects
+
+---
+
+## Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| CORS error on API calls | Ensure `reglog_backend` is running on port `8080` |
+| Cannot connect to backend | Verify backend started with `run.bat` or `java -cp "bin;lib/*" com.reglog.ReglogServer` |
+| Blank white screen on `/home` | This is **intentional** — it's the protected home page. Double-click or press `Escape` to logout. |
+| `npm start` fails | Run `npm install` first, then `npm start` |
+| Login always says "Invalid credentials" | Ensure MySQL is running and the user is registered in `reglog_db` |
