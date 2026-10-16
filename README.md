@@ -2,6 +2,10 @@
 
 A modern, responsive React.js frontend for user registration, login, OTP-based password recovery, and secure JWT session management. Features a warm "Sunshine Classmorphism" design with glowing sun orbs, frosted glass cards, and golden accents.
 
+> **Quick Access:**
+> - 🌐 **Open in browser:** `http://localhost:8080/auth`
+> - 🔌 **API base (not a page):** `http://localhost:8080/api/auth`
+
 ---
 
 ## Tech Stack
@@ -99,7 +103,28 @@ reglog_frontend/
 
 ## How to Run
 
-### Method 1 — React Development Server
+### Method 1 — Via Java Backend (Recommended — No Node.js needed)
+
+Start the `reglog_backend` server, then open in browser:
+
+```
+http://localhost:8080/auth
+```
+
+> ✅ This is the correct URL to open the app in your browser.
+> ❌ Do NOT open `http://localhost:8080/api/auth` — that is the API path, not a page.
+
+Run the backend with:
+```cmd
+cd reglog_backend
+run.bat
+```
+Or:
+```powershell
+java -cp "bin;lib/*" com.reglog.ReglogServer
+```
+
+### Method 2 — React Development Server (Requires Node.js)
 
 ```bash
 # 1. Install dependencies
@@ -109,9 +134,9 @@ npm install
 npm start
 ```
 
-Opens at **`http://localhost:3000`**
+Opens at **`http://localhost:3000`** — make sure `reglog_backend` is also running on port `8080`.
 
-### Method 2 — Instant Preview (No Build Required)
+### Method 3 — Instant Preview (No Build Required)
 
 Open the standalone [`index.html`](index.html) directly in any browser. It uses embedded React + Babel CDN and connects directly to `http://localhost:8080/api/auth`.
 
